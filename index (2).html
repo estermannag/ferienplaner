@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f4e79">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ferien 2027">
+<title>Ferienplaner 2027</title>
+<style>
+:root{
+  --blue:#1f4e79;--blue-2:#2e6aa3;--bg:#f3f5f8;--card:#fff;--text:#1d2530;--muted:#6b7684;
+  --line:#e2e6ec;--f:#2e9e5b;--h:#9fd8b4;--warn:#e8833a;--warn-bg:#fdf0e6;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);
+  font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:var(--blue);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 16px 12px;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:19px;font-weight:700}
+header .sub{font-size:13px;opacity:.8;margin-top:2px}
+.tabs{display:flex;gap:6px;margin-top:12px}
+.tab{flex:1;border:0;border-radius:10px;padding:9px 4px;font-size:14px;font-weight:600;
+  background:rgba(255,255,255,.14);color:#fff;cursor:pointer}
+.tab.on{background:#fff;color:var(--blue)}
+main{max-width:640px;margin:0 auto;padding:14px 16px 90px}
+.who{background:var(--card);border-radius:14px;padding:12px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.who .lbl{font-size:13px;color:var(--muted);margin-bottom:8px}
+.people{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.person{border:2px solid var(--line);background:#fff;border-radius:10px;padding:10px 8px;font-size:15px;
+  font-weight:600;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:8px;text-align:left}
+.person.on{border-color:var(--blue);background:#eaf1f8;color:var(--blue)}
+.dot{width:22px;height:22px;border-radius:50%;color:#fff;font-size:11px;font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;flex:none}
+.hint{font-size:13px;color:var(--muted);margin:0 2px 12px}
+.week{background:var(--card);border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.wk-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.wk-title{font-weight:700;font-size:16px}
+.wk-range{font-size:13px;color:var(--muted);margin-left:6px;font-weight:400}
+.wk-all{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;font-size:13px;
+  color:var(--blue);font-weight:600;cursor:pointer}
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.day{border:2px solid var(--line);border-radius:10px;background:#fff;padding:7px 2px 6px;text-align:center;
+  cursor:pointer;min-height:84px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--text)}
+.day .wd{font-size:12px;color:var(--muted);font-weight:600}
+.day .dt{font-size:15px;font-weight:700}
+.day .me{font-size:11px;font-weight:700;height:15px}
+.day.F{background:var(--f);border-color:var(--f);color:#fff}
+.day.F .wd{color:#e7f6ec}
+.day.H{background:var(--h);border-color:var(--h)}
+.day.warn{box-shadow:0 0 0 2px var(--warn) inset}
+.others{display:flex;flex-wrap:wrap;justify-content:center;gap:2px;min-height:18px}
+.others .dot{width:18px;height:18px;font-size:9px}
+.others .dot.half{opacity:.55}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin:4px 2px 14px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.sw{width:14px;height:14px;border-radius:4px;display:inline-block}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;font-size:14px}
+th,td{padding:9px 6px;text-align:center;border-bottom:1px solid var(--line)}
+th{background:#eaf1f8;color:var(--blue);font-size:12px}
+td:first-child,th:first-child{text-align:left;padding-left:12px}
+td.n{font-weight:700}
+td.z{color:#c3c9d1}
+.tblwrap{overflow-x:auto;border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.05);margin-bottom:14px}
+.clash{background:var(--warn-bg);border-radius:14px;padding:12px;font-size:14px}
+.clash h3{margin:0 0 6px;font-size:15px;color:#a3511a}
+.clash ul{margin:0;padding-left:18px}
+.ok{background:#e8f5ec;border-radius:14px;padding:12px;font-size:14px;color:#1f6b3d}
+.sect{font-size:15px;font-weight:700;margin:16px 2px 8px}
+.status{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:#1d2530;color:#fff;padding:8px 14px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+.status.show{opacity:.92}
+.demo{background:#fff6d6;border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:12px;color:#7a5b00}
+.refresh{background:none;border:0;color:#fff;opacity:.85;font-size:13px;cursor:pointer;padding:0}
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div><h1>Ferienplaner 2027</h1><div class="sub">Gebr. Estermann AG · Schulferien Rain (LU)</div></div>
+    <button class="refresh" id="refresh">↻ Aktualisieren</button>
+  </div>
+  <div class="tabs">
+    <button class="tab on" data-tab="sommer">Sommer</button>
+    <button class="tab" data-tab="herbst">Herbst</button>
+    <button class="tab" data-tab="uebersicht">Übersicht</button>
+  </div>
+</header>
+<main id="app"></main>
+<div class="status" id="status"></div>
+
+<script>
+/* ===== Konfiguration: Web-App-URL aus Google Apps Script ===== */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4ZC0OALb3e9kJ9sd16mJHz1AHesS0EPYC9MOcpqo7CB7M_IFZQfU2iAi9G6EmpGiK/exec";   // z.B. "https://script.google.com/macros/s/AKfy.../exec"
+/* ============================================================== */
+
+const PEOPLE = [ // nach Nachname sortiert
+  {id:"brunner",  name:"Lukas Brunner",    short:"LB", color:"#2e6aa3"},
+  {id:"burkart",  name:"Reto Burkart",     short:"RB", color:"#8e44ad"},
+  {id:"aestermann",name:"Armin Estermann", short:"AE", color:"#c0392b"},
+  {id:"lestermann",name:"Lars Estermann",  short:"LE", color:"#d68910"},
+];
+const PERIODS = {
+  sommer:{label:"Sommerferien 2027", from:"2027-07-03", to:"2027-08-15"},
+  herbst:{label:"Herbstferien 2027", from:"2027-09-25", to:"2027-10-10"},
+};
+const HOLIDAYS = {}; // Feiertage an Werktagen (keine in diesen Zeiträumen)
+const WD = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const DEMO = !SCRIPT_URL;
+
+let data = {};          // key "person|YYYY-MM-DD" -> "F" | "H"
+let me = null;
+let tab = "sommer";
+try{ me = localStorage.getItem("fp_me"); tab = localStorage.getItem("fp_tab") || "sommer"; }catch(e){}
+
+/* ---------- Datum-Helfer ---------- */
+const d2s = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const s2d = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
+const fmt = d => `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.`;
+function isoWeek(d){
+  const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const n=t.getUTCDay()||7; t.setUTCDate(t.getUTCDate()+4-n);
+  const y0=new Date(Date.UTC(t.getUTCFullYear(),0,1));
+  return Math.ceil(((t-y0)/864e5+1)/7);
+}
+function weeksOf(p){ // nur Werktage Mo–Fr, gruppiert nach KW
+  const out=[]; let d=s2d(p.from); const end=s2d(p.to);
+  while(d<=end){
+    const wd=d.getDay();
+    if(wd>=1&&wd<=5){
+      const kw=isoWeek(d); let w=out.find(x=>x.kw===kw);
+      if(!w){w={kw,days:[]};out.push(w);}
+      w.days.push(new Date(d));
+    }
+    d.setDate(d.getDate()+1);
+  }
+  return out;
+}
+
+/* ---------- Speicher ---------- */
+let pending = 0; // laufende Speichervorgänge – solange nicht neu laden
+async function load(){
+  if(DEMO){ try{ data=JSON.parse(localStorage.getItem("fp_demo")||"{}"); }catch(e){data={};} return; }
+  if(pending) return;
+  const r = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
+  const j = await r.json();
+  if(!j.ok) throw new Error(j.error||"Laden fehlgeschlagen");
+  if(pending) return;
+  data={}; j.rows.forEach(x=>data[`${x.person}|${x.datum}`]=x.typ);
+}
+async function save(person, dates, typ){ // typ null = löschen
+  dates.forEach(ds=>{ const k=`${person}|${ds}`; if(typ) data[k]=typ; else delete data[k]; });
+  if(DEMO){ try{ localStorage.setItem("fp_demo",JSON.stringify(data)); }catch(e){} return; }
+  pending++;
+  try{
+    // text/plain vermeidet CORS-Preflight bei Apps Script
+    const r = await fetch(SCRIPT_URL, {method:"POST", body:JSON.stringify({person, dates, typ})});
+    const j = await r.json();
+    if(!j.ok) throw new Error(j.error||"Speichern fehlgeschlagen");
+  } finally { pending--; }
+}
+
+/* ---------- UI ---------- */
+const app = document.getElementById("app");
+let toastT;
+function toast(msg){ const s=document.getElementById("status"); s.textContent=msg; s.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>s.classList.remove("show"),1600); }
+const P = id => PEOPLE.find(p=>p.id===id);
+const absentOn = ds => PEOPLE.map(p=>({p, t:data[`${p.id}|${ds}`]})).filter(x=>x.t);
+const weight = t => t==="F"?1:t==="H"?.5:0;
+const el = (tag, cls, txt) => { const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; };
+
+function render(){
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on", b.dataset.tab===tab));
+  app.innerHTML="";
+  if(DEMO){ app.appendChild(el("div","demo","Testmodus: Einträge werden nur auf diesem Gerät gespeichert. Für den gemeinsamen Betrieb die Web-App-URL in index.html eintragen.")); }
+  if(tab==="uebersicht") return renderOverview();
+
+  // Wer bin ich
+  const who = el("div","who");
+  who.appendChild(el("div","lbl", me ? "Du trägst ein für:" : "Wer bist du? Bitte zuerst Namen wählen:"));
+  const grid = el("div","people");
+  PEOPLE.forEach(p=>{
+    const b = el("button","person"+(me===p.id?" on":""));
+    const dot = el("span","dot",p.short); dot.style.background=p.color;
+    b.append(dot, document.createTextNode(p.name));
+    b.onclick=()=>{ me=p.id; try{localStorage.setItem("fp_me",me);}catch(e){} render(); };
+    grid.appendChild(b);
+  });
+  who.appendChild(grid); app.appendChild(who);
+
+  const per = PERIODS[tab];
+  app.appendChild(el("div","hint", `${per.label}: ${fmt(s2d(per.from))}–${fmt(s2d(per.to))}2027 · Tag antippen: Ferien → halber Tag → leer`));
+
+  const lg = el("div","legend");
+  [["var(--f)","Ferien"],["var(--h)","Halber Tag"],["#fff;box-shadow:0 0 0 2px var(--warn) inset","≥ 2 Personen weg"]]
+    .forEach(([c,t])=>{ const s=el("span"); const sw=el("span","sw"); sw.setAttribute("style","background:"+c); s.append(sw,t); lg.appendChild(s); });
+  app.appendChild(lg);
+
+  weeksOf(per).forEach(w=>{
+    const card = el("div","week");
+    const head = el("div","wk-head");
+    const t = el("div","wk-title",`KW ${w.kw}`);
+    t.appendChild(el("span","wk-range",`${fmt(w.days[0])}–${fmt(w.days[w.days.length-1])}`));
+    head.appendChild(t);
+    if(me){
+      const dss = w.days.map(d2s);
+      const full = dss.every(ds=>data[`${me}|${ds}`]==="F");
+      const btn = el("button","wk-all", full ? "Woche leeren" : "Ganze Woche");
+      btn.onclick = ()=>act(dss, full?null:"F");
+      head.appendChild(btn);
+    }
+    card.appendChild(head);
+    const days = el("div","days");
+    w.days.forEach(d=>{
+      const ds=d2s(d), mine=me?data[`${me}|${ds}`]:null;
+      const abs=absentOn(ds), sum=abs.reduce((a,x)=>a+weight(x.t),0);
+      const b = el("button","day"+(mine?" "+mine:"")+(sum>=2?" warn":""));
+      b.append(el("span","wd",WD[d.getDay()]), el("span","dt",fmt(d)), el("span","me",mine==="F"?"Ferien":mine==="H"?"½ Tag":""));
+      const o = el("div","others");
+      abs.filter(x=>x.p.id!==me).forEach(x=>{ const dot=el("span","dot"+(x.t==="H"?" half":""),x.p.short); dot.style.background=x.p.color; dot.title=x.p.name+(x.t==="H"?" (½)":""); o.appendChild(dot); });
+      b.appendChild(o);
+      b.onclick=()=>{
+        if(!me){ toast("Bitte zuerst deinen Namen wählen"); window.scrollTo({top:0,behavior:"smooth"}); return; }
+        act([ds], mine===undefined||mine===null ? "F" : mine==="F" ? "H" : null);
+      };
+      days.appendChild(b);
+    });
+    card.appendChild(days); app.appendChild(card);
+  });
+}
+
+async function act(dss, typ){
+  const prev = dss.map(ds=>[ds,data[`${me}|${ds}`]]);
+  try{ const p=save(me,dss,typ); render(); await p; toast(typ?"Gespeichert ✓":"Entfernt ✓"); }
+  catch(e){ prev.forEach(([ds,t])=>{ const k=`${me}|${ds}`; if(t) data[k]=t; else delete data[k]; }); render(); toast("Fehler – bitte nochmals versuchen"); }
+}
+
+function renderOverview(){
+  Object.entries(PERIODS).forEach(([key,per])=>{
+    const weeks = weeksOf(per);
+    app.appendChild(el("div","sect",per.label));
+    const wrap = el("div","tblwrap"); const tb = el("table");
+    const hr = el("tr"); hr.appendChild(el("th",null,"Name"));
+    weeks.forEach(w=>hr.appendChild(el("th",null,"KW "+w.kw))); hr.appendChild(el("th",null,"Total"));
+    tb.appendChild(hr);
+    PEOPLE.forEach(p=>{
+      const tr=el("tr"); tr.appendChild(el("td",null,p.name)); let tot=0;
+      weeks.forEach(w=>{ const n=w.days.reduce((a,d)=>a+weight(data[`${p.id}|${d2s(d)}`]),0); tot+=n;
+        tr.appendChild(el("td",n?"n":"z",n?String(n).replace(".",","):"–")); });
+      tr.appendChild(el("td","n",String(tot).replace(".",","))); tb.appendChild(tr);
+    });
+    wrap.appendChild(tb); app.appendChild(wrap);
+  });
+  // Überschneidungen
+  const clashes=[];
+  Object.values(PERIODS).forEach(per=>weeksOf(per).forEach(w=>w.days.forEach(d=>{
+    const abs=absentOn(d2s(d)); if(abs.reduce((a,x)=>a+weight(x.t),0)>=2)
+      clashes.push(`${WD[d.getDay()]} ${fmt(d)} (KW ${w.kw}): ${abs.map(x=>x.p.name.split(" ")[0]+(x.t==="H"?" ½":"")).join(", ")}`);
+  })));
+  if(clashes.length){
+    const c=el("div","clash"); c.appendChild(el("h3",null,`Überschneidungen (${clashes.length} ${clashes.length===1?"Tag":"Tage"})`));
+    const ul=el("ul"); clashes.forEach(x=>ul.appendChild(el("li",null,x))); c.appendChild(ul); app.appendChild(c);
+  }else app.appendChild(el("div","ok","Keine Überschneidungen – an jedem Tag ist höchstens eine Person weg."));
+}
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{ tab=b.dataset.tab; try{localStorage.setItem("fp_tab",tab);}catch(e){} render(); window.scrollTo(0,0); });
+async function refresh(silent){ try{ await load(); render(); if(!silent) toast("Aktualisiert"); }catch(e){ render(); toast("Keine Verbindung"); } }
+document.getElementById("refresh").onclick=()=>refresh(false);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) refresh(true); });
+setInterval(()=>{ if(!document.hidden) refresh(true); }, 30000);
+refresh(true);
+</script>
+</body>
+</html>
